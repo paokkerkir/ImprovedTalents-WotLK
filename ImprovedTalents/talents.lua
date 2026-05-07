@@ -225,6 +225,15 @@ local function CreateGlyphSlot(parent, slotID, glyphType)
                 end
             end
         else
+            -- Shift+left-click: link glyph spell to chat
+            if IsShiftKeyDown() then
+                local _, _, glyphSpell = GetGlyphSocketInfo(self.slotID, talentGroup)
+                if glyphSpell then
+                    local link = GetSpellLink(glyphSpell)
+                    if link then ChatEdit_InsertLink(link) end
+                end
+                return
+            end
             if talentGroup == (GetActiveTalentGroup and GetActiveTalentGroup() or 1) then
                 pcall(PlaceGlyphInSocket, self.slotID)
             end
@@ -737,6 +746,18 @@ local function CreateTalentButton(tabIndex, talentIndex, tier, column, isPet)
                     pcall(AddPreviewTalentPoints, self.tabIndex, self.talentIndex, -1, false, currentTalentGroup)
                 end
             end
+            return
+        end
+
+        -- Shift+left-click: link talent to chat
+        if IsShiftKeyDown() then
+            local ok, link
+            if self.isPet then
+                ok, link = pcall(GetTalentLink, self.tabIndex, self.talentIndex, false, true, 1)
+            else
+                ok, link = pcall(GetTalentLink, self.tabIndex, self.talentIndex, false, false, currentTalentGroup)
+            end
+            if ok and link then ChatEdit_InsertLink(link) end
             return
         end
 
